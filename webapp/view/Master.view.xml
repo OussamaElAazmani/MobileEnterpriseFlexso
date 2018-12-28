@@ -1,0 +1,60 @@
+<mvc:View controllerName="be.ehb.mobile.EnterpriseFlexso.controller.Master"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns="sap.m"
+	xmlns:semantic="sap.m.semantic">
+	<semantic:MasterPage id="page" title="{masterView>/title}" navButtonPress="onNavBack" showNavButton="true">
+		<semantic:subHeader>
+			<Bar id="headerBar">
+				<contentMiddle>
+					<SearchField id="searchField" showRefreshButton="{= !${device>/support/touch} }" tooltip="{i18n>masterSearchTooltip}" width="100%"
+						search="onSearch"></SearchField>
+				</contentMiddle>
+			</Bar>
+		</semantic:subHeader>
+		<IconTabBar expandable="false" expanded="true" applyContentPadding="false" backgroundDesign="Solid" upperCase="false" visible="true" selectedKey="Ok">
+			<items>
+			<IconTabFilter icon="sap-icon://person-placeholder" iconColor="Positive" text="Personeel" count="" design="Vertical" showAll="false" textDirection="Inherit" enabled="true" visible="true" iconDensityAware="false">
+				<Button icon="sap-icon://doctor" press="onAdd" id="addButton" enabled="{appView>/addEnabled}" text="add employee"/>
+				<content>
+					<PullToRefresh id="pullToRefresh" visible="{device>/support/touch}" refresh="onRefresh"/>
+					<!-- For client side filtering add this to the items attribute:  parameters: {operationMode: 'Client'}}" -->
+					<List id="list"
+				items="{ path: '/EmployeeOdataSet', sorter: { path: 'Lastname', descending: false }, groupHeaderFactory: '.createGroupHeader' }"
+				busyIndicatorDelay="{masterView>/delay}" noDataText="{masterView>/noDataText}"
+				mode="{= ${device>/system/phone} ? 'None' : 'SingleSelectMaster'}" growing="true" growingScrollToLoad="true"
+				updateFinished="onUpdateFinished" selectionChange="onSelectionChange">
+						<infoToolbar>
+							<Toolbar active="true" id="filterBar" visible="{masterView>/isFilterBarVisible}" press="onOpenViewSettings">
+								<Title id="filterBarLabel" text="{masterView>/filterBarLabel}"/>
+							</Toolbar>
+						</infoToolbar>
+						<items>
+							<ObjectListItem type="{= ${device>/system/phone} ? 'Active' : 'Inactive'}" press="onSelectionChange" title="{Lastname} {Firstname}"  numberUnit="{Job}"></ObjectListItem>
+						</items>
+					</List>
+				</content>
+			</IconTabFilter>
+			<IconTabSeparator icon="" iconDensityAware="false"/>
+			<IconTabFilter icon="sap-icon://task" iconColor="Neutral" text="Project" count="" design="Vertical" showAll="false" textDirection="Inherit" enabled="true" visible="true" iconDensityAware="false">
+				<Button icon="sap-icon://doctor" press="onAddProject" id="addButtonProject" enabled="{appView>/addEnabled}" text="add project"/>
+				<content>
+					<List id="listProject" items="{ path: '/ProjectOdataSet', sorter: { path: 'Titel', descending: false }, groupHeaderFactory: '.createGroupHeader' }"
+				busyIndicatorDelay="{masterView>/delay}" noDataText="{masterView>/noDataText}"
+				mode="{= ${device>/system/phone} ? 'None' : 'SingleSelectMaster'}" growing="true" growingScrollToLoad="true"
+				updateFinished="onUpdateFinished" selectionChange="onSelectionChangeProject">
+				<infoToolbar>
+					<Toolbar active="true" id="filterBarProject" visible="{masterView>/isFilterBarVisible}" press="onOpenViewSettings">
+						<Title id="filterBarLabelProject" text="{masterView>/filterBarLabel}"/>
+					</Toolbar>
+				</infoToolbar>
+				<items>
+					<ObjectListItem type="{= ${device>/system/phone} ? 'Active' : 'Inactive'}" press="onSelectionChangeProject" title="{Titel}" numberUnit="{Status}"></ObjectListItem>
+				</items>
+			</List>
+				</content>
+			</IconTabFilter>
+			</items>
+		</IconTabBar>
+	</semantic:MasterPage>
+</mvc:View>

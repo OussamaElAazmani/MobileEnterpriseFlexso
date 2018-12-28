@@ -1,0 +1,47 @@
+<edmx:Edmx xmlns:edmx="http://schemas.microsoft.com/ado/2007/06/edmx"
+	xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata" xmlns:sap="http://www.sap.com/Protocols/SAPData" Version="1.0">
+	<edmx:DataServices m:DataServiceVersion="2.0">
+		<Schema xmlns="http://schemas.microsoft.com/ado/2008/09/edm" Namespace="YXM_122_ODATA_SRV" xml:lang="en" sap:schema-version="1">
+			<EntityType Name="EmployeeOdata" sap:content-version="1">
+				<Key><PropertyRef Name="Employeeid"/></Key><Property Name="Employeeid" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Business event" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Firstname" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Lastname" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Address" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Job" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false" sap:updatable="false"
+					sap:sortable="false" sap:filterable="false"/><Property Name="Birthdate" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Phonenumber" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><NavigationProperty Name="PdetailOdata" Relationship="YXM_122_ODATA_SRV.EMPPDET" FromRole="FromRole_EMPPDET" ToRole="ToRole_EMPPDET"/></EntityType>
+			<EntityType Name="PdetailOdata" sap:content-version="1">
+				<Key><PropertyRef Name="Projectdetailid"/></Key><Property Name="Projectdetailid" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Business event" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Employeeid" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Business event" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Projectid" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Business event" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Evaluationid" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Business event" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><NavigationProperty Name="EmployeeOdataSet" Relationship="YXM_122_ODATA_SRV.EMPPDET" FromRole="ToRole_EMPPDET" ToRole="FromRole_EMPPDET"/></EntityType>
+			<EntityType Name="ProjectOdata" sap:content-version="1">
+				<Key><PropertyRef Name="Projectid"/></Key><Property Name="Projectid" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Business event" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Titel" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Description" Type="Edm.String" Nullable="false" MaxLength="300" sap:label="Character 300" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Startdate" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Einddate" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Customer" Type="Edm.String" Nullable="false" MaxLength="20" sap:label="Char20" sap:creatable="false" sap:updatable="false"
+					sap:sortable="false" sap:filterable="false"/><Property Name="Status" Type="Edm.String" Nullable="false" MaxLength="20" sap:label="Char20" sap:creatable="false" sap:updatable="false"
+					sap:sortable="false" sap:filterable="false"/></EntityType>
+			<EntityType Name="EvalutieOdata" sap:content-version="1">
+				<Key><PropertyRef Name="Evaluationid"/></Key><Property Name="Evaluationid" Type="Edm.String" Nullable="false" MaxLength="8" sap:label="Business event" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Quality" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Punctuality" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Extraimpact" Type="Edm.String" Nullable="false" MaxLength="30" sap:label="30 Characters" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/><Property Name="Info" Type="Edm.String" Nullable="false" MaxLength="300" sap:label="Character 300" sap:creatable="false"
+					sap:updatable="false" sap:sortable="false" sap:filterable="false"/></EntityType>
+			<Association Name="EMPPDET" sap:content-version="1"><End Type="YXM_122_ODATA_SRV.EmployeeOdata" Multiplicity="*" Role="FromRole_EMPPDET"/><End Type="YXM_122_ODATA_SRV.PdetailOdata" Multiplicity="1" Role="ToRole_EMPPDET"/>
+				<ReferentialConstraint>
+					<Principal Role="FromRole_EMPPDET"><PropertyRef Name="Employeeid"/></Principal>
+					<Dependent Role="ToRole_EMPPDET"><PropertyRef Name="Projectdetailid"/></Dependent>
+				</ReferentialConstraint>
+			</Association>
+			<EntityContainer Name="YXM_122_ODATA_SRV_Entities" m:IsDefaultEntityContainer="true" sap:supported-formats="atom json xlsx"><EntitySet Name="EmployeeOdataSet" EntityType="YXM_122_ODATA_SRV.EmployeeOdata" sap:content-version="1"/><EntitySet Name="PdetailOdataSet" EntityType="YXM_122_ODATA_SRV.PdetailOdata" sap:content-version="1"/><EntitySet Name="ProjectOdataSet" EntityType="YXM_122_ODATA_SRV.ProjectOdata" sap:content-version="1"/><EntitySet Name="EvalutieOdataSet" EntityType="YXM_122_ODATA_SRV.EvalutieOdata" sap:content-version="1"/>
+				<AssociationSet Name="EMPPDETSet" Association="YXM_122_ODATA_SRV.EMPPDET" sap:creatable="false" sap:updatable="false" sap:deletable="false"
+					sap:content-version="1"><End EntitySet="EmployeeOdataSet" Role="FromRole_EMPPDET"/><End EntitySet="PdetailOdataSet" Role="ToRole_EMPPDET"/></AssociationSet>
+			</EntityContainer><atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="self" href="./sap/opu/odata/SAP/YXM_122_ODATA_SRV/$metadata"/><atom:link xmlns:atom="http://www.w3.org/2005/Atom" rel="latest-version" href="./sap/opu/odata/SAP/YXM_122_ODATA_SRV/$metadata"/></Schema>
+	</edmx:DataServices>
+</edmx:Edmx>
