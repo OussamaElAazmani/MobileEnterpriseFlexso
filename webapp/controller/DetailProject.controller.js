@@ -13,11 +13,61 @@ sap.ui.define([
 
 		formatter: formatter,
 
+
+		onInit: function () {
+			// Model used to manipulate control states. The chosen values make sure,
+			// detail page is busy indication immediately so there is no break in
+			// between the busy indication for loading the view's meta data
+			var oViewModel = new JSONModel({
+				busy: false,
+				delay: 0
+			});
+			/*
+			var that = this;
+			var oModel = new sap.ui.model.odata.v2.ODataModel({
+											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
+                                        });
+           oModel.read("/PdetailOdataSet", {
+				method: "GET",
+            	success: function(data){
+            		var employees = [];
+            		for(var i = 0; i < data.results.length; i++) {
+            			employees.push({ empid: data.results[i].Employeeid ,
+            							 projid: data.results[i].Projectid
+            			});
+            		}
+            		var json = JSON.stringify(employees);
+            		var jsonModel = new sap.ui.model.json.JSONModel();
+            		jsonModel.setData({
+            			arrayName: json
+            	
+            		});
+            		console.log(json);
+            		that.setModel(jsonModel, "modelPath");
+
+     
+            	}, 
+            	error: function(oError){
+    				     
+            	}
+            });*/
+            
+			this.getRouter().getRoute("project").attachPatternMatched(this._onObjectMatched, this);
+			this.setModel(oViewModel, "detailView");
+			this.getOwnerComponent().getModel().metadataLoaded().then(this._onMetadataLoaded.bind(this));
+			this._oODataModel = this.getOwnerComponent().getModel();
+			this._oResourceBundle = this.getResourceBundle();
+		},
+
 		/* =========================================================== */
-		/* lifecycle methods                                           */
+		/* event handlers                                              */
 		/* =========================================================== */
-		
-		onLoadDetail: function()
+
+		/**
+		 * Event handler when the share by E-Mail button has been clicked
+		 * @public
+		 */
+		 onLoadDetail: function()
 		{
 			//https://help.sap.com/doc/saphelp_nw751abap/7.51.0/de-DE/6c/47b2b39db9404582994070ec3d57a2/frameset.htm
 			//https://stackoverflow.com/questions/43320658/sapui5-fill-list-from-model-read
@@ -57,37 +107,6 @@ sap.ui.define([
             
        
 		},
-		
-
-		onInit: function () {
-			// Model used to manipulate control states. The chosen values make sure,
-			// detail page is busy indication immediately so there is no break in
-			// between the busy indication for loading the view's meta data
-			var oViewModel = new JSONModel({
-				busy: false,
-				delay: 0
-			});
-			
-			var oModel = new sap.ui.model.odata.v2.ODataModel({
-											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
-                                        });
-            this.getView().setModel(oModel);
-
-			this.getRouter().getRoute("project").attachPatternMatched(this._onObjectMatched, this);
-			this.setModel(oViewModel, "detailView");
-			this.getOwnerComponent().getModel().metadataLoaded().then(this._onMetadataLoaded.bind(this));
-			this._oODataModel = this.getOwnerComponent().getModel();
-			this._oResourceBundle = this.getResourceBundle();
-		},
-
-		/* =========================================================== */
-		/* event handlers                                              */
-		/* =========================================================== */
-
-		/**
-		 * Event handler when the share by E-Mail button has been clicked
-		 * @public
-		 */
 		onShareEmailPress: function () {
 			var oViewModel = this.getModel("detailView");
 
@@ -215,6 +234,46 @@ sap.ui.define([
 				oElementBinding = oView.getElementBinding(),
 				oViewModel = this.getModel("detailView"),
 				oAppViewModel = this.getModel("appView");
+				
+				var objectString = this.getView().getElementBinding().getPath();
+				var objectid = objectString.substring(19, 26);
+				
+			//var that = this;
+			var oModel = new sap.ui.model.odata.v2.ODataModel({
+											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
+                                        });
+           oModel.read("/PdetailOdataSet", {
+				method: "GET",
+            	success: function(data){
+            		var employees = [];
+            		var temp = [];
+            		for(var i = 0; i < data.results.length; i++) {
+            				temp.push({ empid: data.results[i].Employeeid ,
+            							 projid: data.results[i].Projectid
+            				});
+            		}
+            		
+            		for(var j = 0; j < temp.length; j++)
+            		{
+            			var current = temp[j];
+            			var id = current["projid"];
+            			if( id === objectid)
+            			{
+            				employees.push(temp[j]);
+            			}
+            		}
+            		
+            		var jsonModel = new sap.ui.model.json.JSONModel();
+            		jsonModel.setData({
+            			arrayName: employees
+            	
+            		});
+            		oView.setModel(jsonModel, "modelPath");
+            	}, 
+            	error: function(oError){
+    				     
+            	}
+            });	
 
 			// No data for the binding
 			if (!oElementBinding.getBoundContext()) {
@@ -224,7 +283,7 @@ sap.ui.define([
 				this.getOwnerComponent().oListSelector.clearMasterListSelection();
 				return;
 			}
-
+			console.log("init");
 			var sPath = oElementBinding.getBoundContext().getPath(),
 				oResourceBundle = this.getResourceBundle(),
 				oObject = oView.getModel().getObject(sPath),

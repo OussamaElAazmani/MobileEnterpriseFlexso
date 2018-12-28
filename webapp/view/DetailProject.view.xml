@@ -1,4 +1,7 @@
-<mvc:View controllerName="be.ehb.mobile.EnterpriseFlexso.controller.DetailProject" xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc" xmlns:semantic="sap.m.semantic"
+<mvc:View controllerName="be.ehb.mobile.EnterpriseFlexso.controller.DetailProject"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:semantic="sap.m.semantic"
 	xmlns:footerbar="sap.ushell.ui.footerbar">
 	<semantic:DetailPage id="page" navButtonPress="onNavBack" showNavButton="{device>/system/phone}" title="{i18n>detailTitle}"
 		busy="{detailView>/busy}" busyIndicatorDelay="{detailView>/delay}">
@@ -6,16 +9,30 @@
 			<ObjectHeader id="objectHeader" title="{Titel}" numberUnit="{Status}"></ObjectHeader>
 			<IconTabBar id="iconTabBar" class="sapUiResponsiveContentPadding">
 				<items>
-					<IconTabFilter id="iconTabBarFilter1" icon="sap-icon://hint" tooltip="{i18n>detailIconTabBarInfo}"></IconTabFilter>
+					<IconTabFilter id="iconTabBarFilter1" icon="sap-icon://hint" tooltip="{i18n>detailIconTabBarInfo}">
+						<Table items="{ path: 'modelPath>/arrayName' }">
+							<columns>
+								<Column>
+									<Text text="Projectid" />
+								</Column>
+								<Column>
+									<Text text="Projectid" />
+								</Column>
+							</columns>
+							<items>
+								<ColumnListItem>
+									<cells>
+										<Text text="{modelPath>empid}" />
+										<Text text="{modelPath>projid}" />
+									</cells>
+								</ColumnListItem>
+							</items>
+						</Table>
+					</IconTabFilter>
 					<IconTabFilter id="iconTabBarFilter2" icon="sap-icon://attachment" tooltip="{i18n>detailIconTabBarAttachments}"></IconTabFilter>
 				</items>
 			</IconTabBar>
 		</semantic:content>
-		<List id="lineItemsList" items="{ modelPath>/Pdetail }">
-    		<items>
-        		<StandardListItem title="{Employeeid}" description="{Projectid}"/>
-    		</items>
-		</List> 
 		<Button text="load" press="onLoadDetail"></Button>
 		<semantic:editAction>
 			<semantic:EditAction id="edit" press="onEdit"/>
