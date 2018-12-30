@@ -235,17 +235,18 @@ sap.ui.define([
 				oViewModel = this.getModel("detailView"),
 				oAppViewModel = this.getModel("appView");
 				
-				var objectString = this.getView().getElementBinding().getPath();
-				var objectid = objectString.substring(19, 26);
-				
-			//var that = this;
+			var objectString = this.getView().getElementBinding().getPath();
+			var objectid = objectString.substring(19, 26);
+			var oStorage = jQuery.sap.storage(jQuery.sap.storage.Type.local);
+			
+			var employees = [];
 			var oModel = new sap.ui.model.odata.v2.ODataModel({
 											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
                                         });
            oModel.read("/PdetailOdataSet", {
 				method: "GET",
             	success: function(data){
-            		var employees = [];
+            		oStorage.clear();
             		var temp = [];
             		for(var i = 0; i < data.results.length; i++) {
             				temp.push({ empid: data.results[i].Employeeid ,
@@ -255,25 +256,83 @@ sap.ui.define([
             		
             		for(var j = 0; j < temp.length; j++)
             		{
-            			var current = temp[j];
-            			var id = current["projid"];
-            			if( id === objectid)
+            			if(parseInt(temp[j].projid) === parseInt(objectid))
             			{
-            				employees.push(temp[j]);
+            					employees.push(temp[j]);
             			}
             		}
             		
-            		var jsonModel = new sap.ui.model.json.JSONModel();
-            		jsonModel.setData({
-            			arrayName: employees
-            	
-            		});
-            		oView.setModel(jsonModel, "modelPath");
-            	}, 
-            	error: function(oError){
-    				     
+            		//Get Storage object to use
+					
+					oStorage.put("empid", employees);
             	}
             });	
+            
+        	var model = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+/*
+			var filterids = oStorage.get("empid");
+			var oFilter = [];
+			
+			if(filterids instanceof Array)
+			{
+				var ids = "";
+				for(var i = 0; i < filterids.length; i++)
+				{
+					if(i === (filterids.length-1))
+					{
+						ids += filterids[i].empid;
+					}
+					else
+					{
+						ids += filterids[i].empid + ", ";
+					}
+					
+				}
+			//	oFilter.push(new sap.ui.model.Filter("Employeeid", sap.ui.model.FilterOperator.EQ, ids));
+			
+			var fil = new sap.ui.model.Filter({
+					path: "Employeeid",
+					operator: sap.ui.model.FilterOperator.EQ,
+					value1: ids
+			});
+			
+			oFilter.push(fil);
+			
+			} else if(filterids !== null) {
+				var filtersingle = new sap.ui.model.Filter("Employeeid", sap.ui.model.FilterOperator.EQ, filterids.empid);
+				oFilter.push(filtersingle);
+			}*/
+
+
+        	model.read("/EmployeeOdataSet", {
+        		method: "GET",
+            	success: function(emp){   		
+            		var filterids = oStorage.get("empid");
+            		var emps = [];
+            		
+            		for(var i = 0; i < emp.results.length; i++)
+            		{
+            			for(var j = 0; j < filterids.length; j++)
+            			{
+            				if(parseInt(emp.results[i].Employeeid) === parseInt(filterids[j].empid))
+            				{
+            					emps.push(emp.results[i]);
+            				}
+            			}
+            		}
+            		
+            		
+            		var jsonModel = new sap.ui.model.json.JSONModel();
+            		jsonModel.setData({
+            			arrayName: emps
+            
+            		});
+            		oView.setModel(jsonModel, "modelPath");
+            	}
+            });	
+
+            
+           
 
 			// No data for the binding
 			if (!oElementBinding.getBoundContext()) {
@@ -283,7 +342,6 @@ sap.ui.define([
 				this.getOwnerComponent().oListSelector.clearMasterListSelection();
 				return;
 			}
-			console.log("init");
 			var sPath = oElementBinding.getBoundContext().getPath(),
 				oResourceBundle = this.getResourceBundle(),
 				oObject = oView.getModel().getObject(sPath),

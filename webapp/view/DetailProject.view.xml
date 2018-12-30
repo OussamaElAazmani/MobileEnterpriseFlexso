@@ -22,8 +22,8 @@
 							<items>
 								<ColumnListItem>
 									<cells>
-										<Text text="{modelPath>empid}" />
-										<Text text="{modelPath>projid}" />
+										<Text text="{modelPath>Firstname}" /> 
+										<Text text="{modelPath>Lastname}" />
 									</cells>
 								</ColumnListItem>
 							</items>

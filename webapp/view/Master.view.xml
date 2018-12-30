@@ -39,7 +39,7 @@
 			<IconTabFilter icon="sap-icon://task" iconColor="Neutral" text="Project" count="" design="Vertical" showAll="false" textDirection="Inherit" enabled="true" visible="true" iconDensityAware="false">
 				<Button icon="sap-icon://doctor" press="onAddProject" id="addButtonProject" enabled="{appView>/addEnabled}" text="add project"/>
 				<content>
-					<List id="listProject" items="{ path: '/ProjectOdataSet', sorter: { path: 'Titel', descending: false }, groupHeaderFactory: '.createGroupHeader' }"
+					<List id="listProject" items="{ path: '/ProjectOdataSet', sorter: { path: 'Projectid', descending: false }, groupHeaderFactory: '.createGroupHeader' }"
 				busyIndicatorDelay="{masterView>/delay}" noDataText="{masterView>/noDataText}"
 				mode="{= ${device>/system/phone} ? 'None' : 'SingleSelectMaster'}" growing="true" growingScrollToLoad="true"
 				updateFinished="onUpdateFinished" selectionChange="onSelectionChangeProject">
