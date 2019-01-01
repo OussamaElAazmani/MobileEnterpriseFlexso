@@ -22,35 +22,6 @@ sap.ui.define([
 				busy: false,
 				delay: 0
 			});
-			/*
-			var that = this;
-			var oModel = new sap.ui.model.odata.v2.ODataModel({
-											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
-                                        });
-           oModel.read("/PdetailOdataSet", {
-				method: "GET",
-            	success: function(data){
-            		var employees = [];
-            		for(var i = 0; i < data.results.length; i++) {
-            			employees.push({ empid: data.results[i].Employeeid ,
-            							 projid: data.results[i].Projectid
-            			});
-            		}
-            		var json = JSON.stringify(employees);
-            		var jsonModel = new sap.ui.model.json.JSONModel();
-            		jsonModel.setData({
-            			arrayName: json
-            	
-            		});
-            		console.log(json);
-            		that.setModel(jsonModel, "modelPath");
-
-     
-            	}, 
-            	error: function(oError){
-    				     
-            	}
-            });*/
             
 			this.getRouter().getRoute("project").attachPatternMatched(this._onObjectMatched, this);
 			this.setModel(oViewModel, "detailView");
@@ -59,54 +30,8 @@ sap.ui.define([
 			this._oResourceBundle = this.getResourceBundle();
 		},
 
-		/* =========================================================== */
-		/* event handlers                                              */
-		/* =========================================================== */
 
-		/**
-		 * Event handler when the share by E-Mail button has been clicked
-		 * @public
-		 */
-		 onLoadDetail: function()
-		{
-			//https://help.sap.com/doc/saphelp_nw751abap/7.51.0/de-DE/6c/47b2b39db9404582994070ec3d57a2/frameset.htm
-			//https://stackoverflow.com/questions/43320658/sapui5-fill-list-from-model-read
-			var objectString = this.getView().getElementBinding().getPath();
-			var objectid = objectString.substring(19, 26);
-		//	var oView = this.getView();
-			var oModel = new sap.ui.model.odata.v2.ODataModel({
-											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
-                                        });
-          /*  var oStandardListItem = new sap.m.StandardListItem({
-            		title: "{Projectid}",
-            		description: "{Employeeid}"
-        		});	*/
-                                        
-            oModel.read("/PdetailOdataSet?$filter=Projectid eq '" + objectid + "'", {
-				method: "GET",
-            	success: function(data){
-            
-            	var json = new sap.ui.model.json.JSONModel();
-            	json.setData({
-            		Pdetail: data
-            	});
-            	this.getView().setModel(json, "modelPath");
-            //	console.log(json);
-			//	var oList = oView.byId("lineItemsList");
-				
-			//	oList.setModel(json);
-				
-			//	oList.bindAggregation("items", "/Pdetail", oStandardListItem);
-     
-            	}, 
-            	error: function(oError){
-    				console.log("ouinouin");       
-            	}
-            });
-            
-            
-       
-		},
+
 		onShareEmailPress: function () {
 			var oViewModel = this.getModel("detailView");
 
@@ -117,10 +42,7 @@ sap.ui.define([
 			);
 		},
 
-		/**
-		 * Event handler when the share in JAM button has been clicked
-		 * @public
-		 */
+
 		onShareInJamPress: function () {
 			var oViewModel = this.getModel("detailView"),
 				oShareDialog = sap.ui.getCore().createComponent({
@@ -136,11 +58,6 @@ sap.ui.define([
 			oShareDialog.open();
 		},
 
-		/**
-		 * Event handler (attached declaratively) for the view delete button. Deletes the selected item. 
-		 * @function
-		 * @public
-		 */
 		onDelete: function () {
 			var that = this;
 			var oViewModel = this.getModel("detailView"),
@@ -160,11 +77,6 @@ sap.ui.define([
 			}, [sPath], fnMyAfterDeleted);
 		},
 
-		/**
-		 * Event handler (attached declaratively) for the view edit button. Open a view to enable the user update the selected item. 
-		 * @function
-		 * @public
-		 */
 		onEdit: function () {
 			this.getModel("appView").setProperty("/addEnabled", false);
 			var sObjectPath = this.getView().getElementBinding().getPath();
@@ -174,16 +86,7 @@ sap.ui.define([
 			});
 		},
 
-		/* =========================================================== */
-		/* begin: internal methods                                     */
-		/* =========================================================== */
 
-		/**
-		 * Binds the view to the object path and expands the aggregated line items.
-		 * @function
-		 * @param {sap.ui.base.Event} oEvent pattern match event in route 'object'
-		 * @private
-		 */
 		_onObjectMatched: function (oEvent) {
 			var oParameter = oEvent.getParameter("arguments");
 			for (var value in oParameter) {
@@ -195,13 +98,7 @@ sap.ui.define([
 			}.bind(this));
 		},
 
-		/**
-		 * Binds the view to the object path. Makes sure that detail view displays
-		 * a busy indicator while data for the corresponding element binding is loaded.
-		 * @function
-		 * @param {string} sObjectPath path to the object to be bound to the view.
-		 * @private
-		 */
+
 		_bindView: function (sObjectPath) {
 			// Set busy indicator during view binding
 			var oViewModel = this.getModel("detailView");
@@ -223,12 +120,95 @@ sap.ui.define([
 			});
 		},
 
-		/**
-		 * Event handler for binding change event
-		 * @function
-		 * @private
-		 */
+		 onEvaluate: function(oEventArgs)
+		 {
+		 	var row = oEventArgs.getSource();
+        	var context = row.getBindingContext("modelPath");
 
+        	// get binding object (reference to an object of the original array)
+        	var person = context.oModel.getProperty(context.sPath);
+        	
+			if (!this.oAddfeedbackDialog) {
+				this.oAddfeedbackDialog = sap.ui.xmlfragment("be.ehb.mobile.EnterpriseFlexso.view.AddFeedbackDialog", this);
+				this.getView().addDependent(this.oAddfeedbackDialog);
+			}
+			var objectString = this.getView().getElementBinding().getPath();
+			var objectid = objectString.substring(19, 26);
+			var array = [];
+			array.push({empid: person.Employeeid, projid: parseInt(objectid), name: person.Firstname + " " +person.Lastname});
+			var userModel = new sap.ui.model.json.JSONModel();
+            userModel.setData({
+            	arrayName: array
+            });
+			
+			this.oAddfeedbackDialog.setModel(userModel, "userPath");
+			this.oAddfeedbackDialog.open();
+		 },
+		 
+		 _onSubmitFeedback: function()
+		 {
+		 	var model = this.oAddfeedbackDialog.getModel("userPath");
+		 	var person = model.oData.arrayName[0];
+		 	var quality = sap.ui.getCore().byId("quality").getValue();
+		 	var deadlines = sap.ui.getCore().byId("deadlines").getValue();
+		 	var extra = sap.ui.getCore().byId("extra").getValue();
+		 	var info = sap.ui.getCore().byId("info").getValue();
+		 	var latestid = 0;
+		    var oModel = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+           oModel.read("/EvalutieOdataSet", {
+				method: "GET",
+            	success: function(data){
+            		for(var i = 0; i < data.results.length; i++)
+            		{
+            			latestid = data.results[i].Evaluationid;
+            		}
+            		latestid = parseInt(latestid);
+            		latestid += 1;
+            		
+            		var oData = {
+						"d" : {
+    						"__metadata" : {
+    								"id" : "/EvalutieOdataSet('00000004')",
+    								"uri" : "/EvalutieOdataSet('00000004')",
+    								"type" : "YXM_122_ODATA_SRV.EvalutieOdata"
+    						},
+							"Evaluationid" : latestid + "",
+							"Quality" : quality + "",
+							"Punctuality" : deadlines + "",
+							"Extraimpact" : extra + "",
+							"Info" : info + ""
+						}
+					};
+					
+					var oDataModel = new sap.ui.model.odata.v2.ODataModel("/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/");
+                                        
+    				oDataModel.create("/EvalutieOdataSet", oData, {
+    					success: function()
+    					{
+    						
+						   sap.m.MessageToast.show(person.name + " was evaluated");
+    					},
+    					error: function()
+    					{
+    						if (this.oAddfeedbackDialog) {
+								this.oAddfeedbackDialog.close();
+								}
+						   sap.m.MessageBox.error(person.name + " was not evaluated");
+    					}
+    				});
+            	}
+            });	
+			if (this.oAddfeedbackDialog) {
+				this.oAddfeedbackDialog.close();
+			}
+		 },
+		 
+		 _onCloseFeedback: function()
+		 {
+		 	if (this.oAddfeedbackDialog) {
+				this.oAddfeedbackDialog.close();
+			}
+		 },
 		_onBindingChange: function () {
 			var oView = this.getView(),
 				oElementBinding = oView.getElementBinding(),
@@ -269,40 +249,6 @@ sap.ui.define([
             });	
             
         	var model = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
-/*
-			var filterids = oStorage.get("empid");
-			var oFilter = [];
-			
-			if(filterids instanceof Array)
-			{
-				var ids = "";
-				for(var i = 0; i < filterids.length; i++)
-				{
-					if(i === (filterids.length-1))
-					{
-						ids += filterids[i].empid;
-					}
-					else
-					{
-						ids += filterids[i].empid + ", ";
-					}
-					
-				}
-			//	oFilter.push(new sap.ui.model.Filter("Employeeid", sap.ui.model.FilterOperator.EQ, ids));
-			
-			var fil = new sap.ui.model.Filter({
-					path: "Employeeid",
-					operator: sap.ui.model.FilterOperator.EQ,
-					value1: ids
-			});
-			
-			oFilter.push(fil);
-			
-			} else if(filterids !== null) {
-				var filtersingle = new sap.ui.model.Filter("Employeeid", sap.ui.model.FilterOperator.EQ, filterids.empid);
-				oFilter.push(filtersingle);
-			}*/
-
 
         	model.read("/EmployeeOdataSet", {
         		method: "GET",
@@ -331,9 +277,6 @@ sap.ui.define([
             	}
             });	
 
-            
-           
-
 			// No data for the binding
 			if (!oElementBinding.getBoundContext()) {
 				this.getRouter().getTargets().display("detailObjectNotFound");
@@ -360,12 +303,6 @@ sap.ui.define([
 			oViewModel.setProperty("/shareSendEmailMessage",
 				oResourceBundle.getText("shareSendEmailObjectMessage", [sObjectName, sObjectId, location.href]));
 		},
-
-		/**
-		 * Event handler for metadata loaded event
-		 * @function
-		 * @private
-		 */
 
 		_onMetadataLoaded: function () {
 			// Store original busy indicator delay for the detail view
