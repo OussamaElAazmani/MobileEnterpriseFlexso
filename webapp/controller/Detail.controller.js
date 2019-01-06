@@ -33,6 +33,9 @@ sap.ui.define([
 			this._oODataModel = this.getOwnerComponent().getModel();
 			this._oResourceBundle = this.getResourceBundle();
 			
+		
+            	
+			
 		},
 
 		/* =========================================================== */
@@ -117,31 +120,6 @@ sap.ui.define([
 				question: sQuestion
 			}, [sPath], fnMyAfterDeleted);
 		},
-		onLoadDetail: function()
-		{
-			//https://help.sap.com/doc/saphelp_nw751abap/7.51.0/de-DE/6c/47b2b39db9404582994070ec3d57a2/frameset.htm
-			var objectString = this.getView().getElementBinding().getPath();
-			var objectid = objectString.substring(19, 27);
-			var oModel = new sap.ui.model.odata.v2.ODataModel({
-											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
-                                        });
-                                        
-            oModel.read("/PdetailOdataSet('" + objectid +"')", {
-            	success: function(response){
-            	console.log("ICI: " + response.Evaluationid);
-            	}, 
-            	error: function(oError){
-            	console.log("Error: " + oError);
-            	}
-            });
-         
-            
-            
-       
-		}
-		
-		
-		,
 
 		/**
 		 * Event handler (attached declaratively) for the view edit button. Open a view to enable the user update the selected item. 
@@ -211,12 +189,98 @@ sap.ui.define([
 		 * @function
 		 * @private
 		 */
-
+		
 		_onBindingChange: function () {
 			var oView = this.getView(),
 				oElementBinding = oView.getElementBinding(),
 				oViewModel = this.getModel("detailView"),
 				oAppViewModel = this.getModel("appView");
+				
+				
+			var objectString = this.getView().getElementBinding().getPath();
+			var empid = objectString.substring(20,27);
+			
+			var oFilters = [];
+			var oFilter = new sap.ui.model.Filter("Employeeid",sap.ui.model.FilterOperator.Contains,empid);
+			oFilters.push(oFilter);
+			var oModel = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+        	oModel.read("/PdetailOdataSet", {
+        		filters: oFilters,
+        		success: function(data){
+        			var pdetailid = [];
+
+        			if(data.results.length > 0){
+        				for(var i = 0; i < data.results.length; i++)
+        				{
+
+        					pdetailid.push(data.results[i].Evaluationid);
+        				}
+        				var jsonModel = new sap.ui.model.json.JSONModel();
+            			jsonModel.setData({
+            				arrayName: pdetailid
+            	
+            			});
+            			oView.setModel(jsonModel, "evaluatiePath");
+       
+        			}
+        			else
+        			{
+        				var jsonModel = new sap.ui.model.json.JSONModel();
+            			jsonModel.setData({
+            				arrayName: false
+            			});
+            			oView.setModel(jsonModel, "evaluatiePath");
+        			}
+        		}
+        	});
+        	
+        	
+        	oModel.read("/EvalutieOdataSet", {
+        		success: function(data)
+        		{
+        			var evaluatie = oView.getModel("evaluatiePath").oData.arrayName;
+        			var evals = [];
+ 
+        			
+        			if(evaluatie != false)
+        			{
+        				for(var i = 0; i < data.results.length; i++)
+        				{
+        					for(var j = 0; j < evaluatie.length; j++)
+        					{
+        						if(data.results[i].Evaluationid === evaluatie[j])
+        						{
+        							evals.push(data.results[i]);
+        						}
+        					}
+        				}
+        			}
+        			
+        		var jsonModel = new sap.ui.model.json.JSONModel();
+            			jsonModel.setData({
+            				arrayName: evals
+            			});
+            	oView.setModel(jsonModel, "evaluatieModel");
+        		if(evals.length > 0)
+        		{
+				    var punct = 0;
+				    var qual = 0;
+				    var extra = 0;
+				    var info = [];
+				    
+				    for(var i = 0; i < evals.length; i++)
+				    {
+				    	punct += parseInt(evals[i].Punctuality);
+				    	qual += parseInt(evals[i].Quality);
+				    	extra += parseInt(evals[i].Extraimpact);
+				    }
+        		}
+        		},
+        		error: function()
+        		{
+        			
+        		}
+        	});
 
 			// No data for the binding
 			if (!oElementBinding.getBoundContext()) {

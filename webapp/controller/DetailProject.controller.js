@@ -22,35 +22,6 @@ sap.ui.define([
 				busy: false,
 				delay: 0
 			});
-			/*
-			var that = this;
-			var oModel = new sap.ui.model.odata.v2.ODataModel({
-											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
-                                        });
-           oModel.read("/PdetailOdataSet", {
-				method: "GET",
-            	success: function(data){
-            		var employees = [];
-            		for(var i = 0; i < data.results.length; i++) {
-            			employees.push({ empid: data.results[i].Employeeid ,
-            							 projid: data.results[i].Projectid
-            			});
-            		}
-            		var json = JSON.stringify(employees);
-            		var jsonModel = new sap.ui.model.json.JSONModel();
-            		jsonModel.setData({
-            			arrayName: json
-            	
-            		});
-            		console.log(json);
-            		that.setModel(jsonModel, "modelPath");
-
-     
-            	}, 
-            	error: function(oError){
-    				     
-            	}
-            });*/
             
 			this.getRouter().getRoute("project").attachPatternMatched(this._onObjectMatched, this);
 			this.setModel(oViewModel, "detailView");
@@ -59,54 +30,8 @@ sap.ui.define([
 			this._oResourceBundle = this.getResourceBundle();
 		},
 
-		/* =========================================================== */
-		/* event handlers                                              */
-		/* =========================================================== */
 
-		/**
-		 * Event handler when the share by E-Mail button has been clicked
-		 * @public
-		 */
-		 onLoadDetail: function()
-		{
-			//https://help.sap.com/doc/saphelp_nw751abap/7.51.0/de-DE/6c/47b2b39db9404582994070ec3d57a2/frameset.htm
-			//https://stackoverflow.com/questions/43320658/sapui5-fill-list-from-model-read
-			var objectString = this.getView().getElementBinding().getPath();
-			var objectid = objectString.substring(19, 26);
-		//	var oView = this.getView();
-			var oModel = new sap.ui.model.odata.v2.ODataModel({
-											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
-                                        });
-          /*  var oStandardListItem = new sap.m.StandardListItem({
-            		title: "{Projectid}",
-            		description: "{Employeeid}"
-        		});	*/
-                                        
-            oModel.read("/PdetailOdataSet?$filter=Projectid eq '" + objectid + "'", {
-				method: "GET",
-            	success: function(data){
-            
-            	var json = new sap.ui.model.json.JSONModel();
-            	json.setData({
-            		Pdetail: data
-            	});
-            	this.getView().setModel(json, "modelPath");
-            //	console.log(json);
-			//	var oList = oView.byId("lineItemsList");
-				
-			//	oList.setModel(json);
-				
-			//	oList.bindAggregation("items", "/Pdetail", oStandardListItem);
-     
-            	}, 
-            	error: function(oError){
-    				console.log("ouinouin");       
-            	}
-            });
-            
-            
-       
-		},
+
 		onShareEmailPress: function () {
 			var oViewModel = this.getModel("detailView");
 
@@ -117,10 +42,7 @@ sap.ui.define([
 			);
 		},
 
-		/**
-		 * Event handler when the share in JAM button has been clicked
-		 * @public
-		 */
+
 		onShareInJamPress: function () {
 			var oViewModel = this.getModel("detailView"),
 				oShareDialog = sap.ui.getCore().createComponent({
@@ -136,11 +58,6 @@ sap.ui.define([
 			oShareDialog.open();
 		},
 
-		/**
-		 * Event handler (attached declaratively) for the view delete button. Deletes the selected item. 
-		 * @function
-		 * @public
-		 */
 		onDelete: function () {
 			var that = this;
 			var oViewModel = this.getModel("detailView"),
@@ -160,11 +77,6 @@ sap.ui.define([
 			}, [sPath], fnMyAfterDeleted);
 		},
 
-		/**
-		 * Event handler (attached declaratively) for the view edit button. Open a view to enable the user update the selected item. 
-		 * @function
-		 * @public
-		 */
 		onEdit: function () {
 			this.getModel("appView").setProperty("/addEnabled", false);
 			var sObjectPath = this.getView().getElementBinding().getPath();
@@ -174,16 +86,7 @@ sap.ui.define([
 			});
 		},
 
-		/* =========================================================== */
-		/* begin: internal methods                                     */
-		/* =========================================================== */
 
-		/**
-		 * Binds the view to the object path and expands the aggregated line items.
-		 * @function
-		 * @param {sap.ui.base.Event} oEvent pattern match event in route 'object'
-		 * @private
-		 */
 		_onObjectMatched: function (oEvent) {
 			var oParameter = oEvent.getParameter("arguments");
 			for (var value in oParameter) {
@@ -195,13 +98,7 @@ sap.ui.define([
 			}.bind(this));
 		},
 
-		/**
-		 * Binds the view to the object path. Makes sure that detail view displays
-		 * a busy indicator while data for the corresponding element binding is loaded.
-		 * @function
-		 * @param {string} sObjectPath path to the object to be bound to the view.
-		 * @private
-		 */
+
 		_bindView: function (sObjectPath) {
 			// Set busy indicator during view binding
 			var oViewModel = this.getModel("detailView");
@@ -223,29 +120,318 @@ sap.ui.define([
 			});
 		},
 
-		/**
-		 * Event handler for binding change event
-		 * @function
-		 * @private
-		 */
+		 onEvaluate: function(oEventArgs)
+		 {
+		 	var row = oEventArgs.getSource();
+        	var context = row.getBindingContext("modelPath");
+			var oView = this.getView();
+        	// get binding object (reference to an object of the original array)
+        	var person = context.oModel.getProperty(context.sPath);
+        	
+			if (!this.oAddfeedbackDialog) {
+				this.oAddfeedbackDialog = sap.ui.xmlfragment("be.ehb.mobile.EnterpriseFlexso.view.AddFeedbackDialog", this);
+				this.getView().addDependent(this.oAddfeedbackDialog);
+			}
+			var objectString = this.getView().getElementBinding().getPath();
+			var objectid = objectString.substring(19, 26);
+			var array = [];
+			array.push({empid: person.Employeeid, projid: parseInt(objectid), name: person.Firstname + " " +person.Lastname});
+			var userModel = new sap.ui.model.json.JSONModel();
+            userModel.setData({
+            	arrayName: array
+            });
+          //  var oStorage = jQuery.sap.storage(jQuery.sap.storage.Type.local);
+            var oModelCheck = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+        	oModelCheck.read("/PdetailOdataSet", {
+        		success: function(data)
+        		{
 
+            	var mdl = new sap.ui.model.json.JSONModel();
+            			   mdl.setData({
+            					arrayName: {id: data.results}
+            
+            			   });
+            	oView.setModel(mdl, "PdetailPath"); 
+
+            	}
+        	});
+
+			
+			this.oAddfeedbackDialog.setModel(userModel, "userPath");
+			this.oAddfeedbackDialog.open();
+		 }, 
+		 
+		 onAddMembers: function()
+		 {
+		 	var oView = this.getView();
+		 	if (!this.oAddUserDialog) {
+				this.oAddUserDialog = sap.ui.xmlfragment("be.ehb.mobile.EnterpriseFlexso.view.AddUserDialog", this);
+				this.getView().addDependent(this.oAddUserDialog);
+			}
+			this.oAddUserDialog.open();
+			var oModelCheck = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+        	oModelCheck.read("/EmployeeOdataSet", {
+        		success: function(data)
+        		{
+					var odata = data.results; 
+            		var mdl = new sap.ui.model.json.JSONModel();
+            		mdl.setData({
+            			arrayName: odata
+            	
+            		});
+            		oView.setModel(mdl, "EmpPath"); 
+
+            	}
+        	});
+			
+		//	this.oAddUserDialog.setModel(userModel, "userPath");
+			
+		 },
+		 
+		 _onClose: function()
+		 {
+		 	 if (this.oAddUserDialog) {
+					this.oAddUserDialog.close();
+    		 }
+		 },
+		 
+		 _onAddUser: function()
+		 {
+		 	//
+		 	var employeeid = sap.ui.getCore().byId('selectId').getSelectedKey(); 
+        	var objectString = this.getView().getElementBinding().getPath();
+			var projectid = objectString.substring(19, 26);
+
+			var oModel = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+			oModel.read("/PdetailOdataSet",{
+				success:function(data)
+				{
+					var latestid = 0;
+					var exist = false;
+					for(var i = 0; i < data.results.length; i++)
+					{
+						if(parseInt(data.results[0].Employeeid) == parseInt(employeeid) && parseInt(data.results[0].Projectid) == parseInt(projectid)) 
+						{
+							exist = true;	
+						}
+						latestid = data.results[i].Projectdetailid; 
+					}
+					latestid = parseInt(latestid);
+					latestid++;
+					
+					if(exist == false) 
+					{
+						var oData = {
+								  "d" : {
+								    "__metadata" : {
+								      "id" : "/PdetailOdataSet('00000001')",
+								      "uri" : "/PdetailOdataSet('00000001')",
+								      "type" : "YXM_122_ODATA_SRV.PdetailOdata"
+								    },
+								    "Projectdetailid" : latestid + "",
+								    "Employeeid" : parseInt(employeeid) + "",
+								    "Projectid" : parseInt(projectid) + "",
+								    "Evaluationid" : "",
+								    "EmployeeOdataSet" : {
+								      "__deferred" : {
+								        "uri" : "/PdetailOdataSet('00000001')/EmployeeOdataSet"
+								      }
+								    }
+								  }
+								};
+								
+						oModel.create("/PdetailOdataSet", oData);
+					}
+				}
+			});
+
+		 	
+		 },
+		 _onSubmitFeedback: function()
+		 {
+		 	var oView = this.getView();
+		 	var model = this.oAddfeedbackDialog.getModel("userPath");
+		 	var person = model.oData.arrayName[0];
+		 	var quality = sap.ui.getCore().byId("quality").getValue();
+		 	var deadlines = sap.ui.getCore().byId("deadlines").getValue();
+		 	var extra = sap.ui.getCore().byId("extra").getValue();
+		 	var info = sap.ui.getCore().byId("info").getValue();
+		 	var latestid = 0;
+		    var oModel = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+        	oModel.read("/EvalutieOdataSet", {
+					method: "GET",
+        	 	success: function(data){
+        	 		for(var i = 0; i < data.results.length; i++)
+        	 		{
+        	 			latestid = data.results[i].Evaluationid;
+        	 		}
+        	 		latestid = parseInt(latestid);
+        	 		latestid += 1;
+        	 		
+        	 		var oData = {
+							"d" : {
+    							"__metadata" : {
+    									"id" : "/EvalutieOdataSet('00000004')",
+    									"uri" : "/EvalutieOdataSet('00000004')",
+    									"type" : "YXM_122_ODATA_SRV.EvalutieOdata"
+    							},
+								"Evaluationid" : latestid + "",
+								"Quality" : quality + "",
+								"Punctuality" : deadlines + "",
+								"Extraimpact" : extra + "",
+								"Info" : info + ""
+							}
+						};
+						
+						var oDataModel = new sap.ui.model.odata.v2.ODataModel("/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/");
+        	                             
+    					oDataModel.create("/EvalutieOdataSet", oData, {
+    						success: function()
+    						{
+							 //  sap.m.MessageToast.show(person.name + " was evaluated");
+							   
+							   var jsonModel = new sap.ui.model.json.JSONModel();
+        	 			   jsonModel.setData({
+        	 					arrayName: {id: latestid}
+        	 
+        	 			   });
+        	 		    oView.setModel(jsonModel, "latestPath");
+    						},
+    						error: function()
+    						{
+    						   var jsonModel = new sap.ui.model.json.JSONModel();
+        	 			   jsonModel.setData({
+        	 					arrayName: {id: -1}
+        	 
+        	 			   });
+        	 		       oView.setModel(jsonModel, "latestPath");
+							 //  sap.m.MessageBox.error(person.name + " was not evaluated");
+    						}
+    					});
+        	 	}
+        	 });
+            
+		 			// id of created evaluation
+        			var testModel = oView.getModel("latestPath").oData;
+            		var id = testModel.arrayName.id;	
+            		// all pdetails
+            		var details = oView.getModel("PdetailPath").oData;
+    				var exist = false;
+        			var pdetailid = -1;
+        			var latest = 0;
+
+        		
+        			for(var i = 0; i < details.arrayName["id"].length; i++)
+        			{
+        				if(parseInt(details.arrayName["id"][i].Employeeid) === parseInt(person.empid) && parseInt(details.arrayName["id"][i].Projectid) === person.projid)
+        				{
+        					
+        					pdetailid = details.arrayName["id"][i].Projectdetailid;
+
+        					exist = true;
+        				}
+        				latest = details.arrayName["id"][i].Projectdetailid;
+
+        				if(exist)
+        				{
+        					i = details.arrayName["id"].length;
+        				}
+        			}
+        			latest = parseInt(latest);
+        			latest++;
+        		
+        			if(exist)
+        			{
+        				
+        				var data = 
+									{
+									  "d" : {
+									    "__metadata" : {
+									      "id" : "/PdetailOdataSet('00000001')",
+									      "uri" : "/PdetailOdataSet('00000001')",
+									      "type" : "YXM_122_ODATA_SRV.PdetailOdata"
+									    },
+									    "Projectdetailid" : pdetailid + "",
+									    "Employeeid" : person.empid + "",
+									    "Projectid" : person.projid + "",
+									    "Evaluationid" : id+ "",
+									    "EmployeeOdataSet" : {
+									      "__deferred" : {
+									        "uri" : "/PdetailOdataSet('00000001')/EmployeeOdataSet"
+									      }
+									    }
+									  }
+									};
+        				
+        				
+        				var path = "/PdetailOdataSet('" + parseInt(pdetailid) + "')";
+        				var oDataModel = new sap.ui.model.odata.v2.ODataModel("/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/");
+    					oDataModel.update(path, data);
+    					
+    					 if (this.oAddfeedbackDialog) {
+							this.oAddfeedbackDialog.close();
+    					 }
+        			}
+        			else
+        			{
+        					var data = 
+									{
+									  "d" : {
+									    "__metadata" : {
+									      "id" : "/PdetailOdataSet('00000001')",
+									      "uri" : "/PdetailOdataSet('00000001')",
+									      "type" : "YXM_122_ODATA_SRV.PdetailOdata"
+									    },
+									    "Projectdetailid" : latest + "",
+									    "Employeeid" : person.empid + "",
+									    "Projectid" : person.projid + "",
+									    "Evaluationid" : id + "",
+									    "EmployeeOdataSet" : {
+									      "__deferred" : {
+									        "uri" : "/PdetailOdataSet('00000001')/EmployeeOdataSet"
+									      }
+									    }
+									  }
+									};
+        				var path = "/PdetailOdataSet('" + parseInt(pdetailid) + "')";
+        				var oDataModel = new sap.ui.model.odata.v2.ODataModel("/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/");
+    					oDataModel.create(path, data);
+    					
+    					 if (this.oAddfeedbackDialog) {
+								this.oAddfeedbackDialog.close();
+							}
+        			}
+
+            
+
+		 },
+		 
+	
+		 
+		 _onCloseFeedback: function()
+		 {
+		 	if (this.oAddfeedbackDialog) {
+				this.oAddfeedbackDialog.close();
+			}
+		 },
 		_onBindingChange: function () {
 			var oView = this.getView(),
 				oElementBinding = oView.getElementBinding(),
 				oViewModel = this.getModel("detailView"),
 				oAppViewModel = this.getModel("appView");
 				
-				var objectString = this.getView().getElementBinding().getPath();
-				var objectid = objectString.substring(19, 26);
-				
-			//var that = this;
+			var objectString = this.getView().getElementBinding().getPath();
+			var objectid = objectString.substring(19, 26);
+			var oStorage = jQuery.sap.storage(jQuery.sap.storage.Type.local);
+			
+			var employees = [];
 			var oModel = new sap.ui.model.odata.v2.ODataModel({
 											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
                                         });
            oModel.read("/PdetailOdataSet", {
 				method: "GET",
             	success: function(data){
-            		var employees = [];
+            		oStorage.clear();
             		var temp = [];
             		for(var i = 0; i < data.results.length; i++) {
             				temp.push({ empid: data.results[i].Employeeid ,
@@ -255,23 +441,44 @@ sap.ui.define([
             		
             		for(var j = 0; j < temp.length; j++)
             		{
-            			var current = temp[j];
-            			var id = current["projid"];
-            			if( id === objectid)
+            			if(parseInt(temp[j].projid) === parseInt(objectid))
             			{
-            				employees.push(temp[j]);
+            					employees.push(temp[j]);
             			}
             		}
             		
+            		//Get Storage object to use
+					
+					oStorage.put("empid", employees);
+            	}
+            });	
+            
+        	var model = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+
+        	model.read("/EmployeeOdataSet", {
+        		method: "GET",
+            	success: function(emp){   		
+            		var filterids = oStorage.get("empid");
+            		var emps = [];
+            		
+            		for(var i = 0; i < emp.results.length; i++)
+            		{
+            			for(var j = 0; j < filterids.length; j++)
+            			{
+            				if(parseInt(emp.results[i].Employeeid) === parseInt(filterids[j].empid))
+            				{
+            					emps.push(emp.results[i]);
+            				}
+            			}
+            		}
+            		
+            		
             		var jsonModel = new sap.ui.model.json.JSONModel();
             		jsonModel.setData({
-            			arrayName: employees
-            	
+            			arrayName: emps
+            
             		});
             		oView.setModel(jsonModel, "modelPath");
-            	}, 
-            	error: function(oError){
-    				     
             	}
             });	
 
@@ -283,7 +490,6 @@ sap.ui.define([
 				this.getOwnerComponent().oListSelector.clearMasterListSelection();
 				return;
 			}
-			console.log("init");
 			var sPath = oElementBinding.getBoundContext().getPath(),
 				oResourceBundle = this.getResourceBundle(),
 				oObject = oView.getModel().getObject(sPath),
@@ -302,12 +508,6 @@ sap.ui.define([
 			oViewModel.setProperty("/shareSendEmailMessage",
 				oResourceBundle.getText("shareSendEmailObjectMessage", [sObjectName, sObjectId, location.href]));
 		},
-
-		/**
-		 * Event handler for metadata loaded event
-		 * @function
-		 * @private
-		 */
 
 		_onMetadataLoaded: function () {
 			// Store original busy indicator delay for the detail view

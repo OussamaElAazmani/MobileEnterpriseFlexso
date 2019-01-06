@@ -1,4 +1,5 @@
 /*global history */
+/*eslint-disable no-console, no-alert */
 sap.ui.define([
 	"be/ehb/mobile/EnterpriseFlexso/controller/BaseController",
 	"sap/ui/model/json/JSONModel",
@@ -7,8 +8,10 @@ sap.ui.define([
 	"sap/m/GroupHeaderListItem",
 	"sap/ui/Device",
 	"be/ehb/mobile/EnterpriseFlexso/model/formatter",
-	"sap/m/MessageBox"
-], function (BaseController, JSONModel, Filter, FilterOperator, GroupHeaderListItem, Device, formatter, MessageBox) {
+	"sap/m/MessageBox",
+	"sap/ui/core/util/Export",
+	"sap/ui/core/util/ExportTypeCSV"
+], function (BaseController, JSONModel, Filter, FilterOperator, GroupHeaderListItem, Device, formatter, MessageBox, Export, ExportTypeCSV) {
 	"use strict";
 
 	return BaseController.extend("be.ehb.mobile.EnterpriseFlexso.controller.Master", {
@@ -39,6 +42,21 @@ sap.ui.define([
 				aFilter: [],
 				aSearch: []
 			};
+			var oView = this;
+			var oModel = new sap.ui.model.odata.v2.ODataModel({
+											serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"
+                                        });
+                                        
+            oModel.read("/ProjectOdataSet", {
+            	success: function(data){
+					var jsonModel = new sap.ui.model.json.JSONModel();
+            			jsonModel.setData({
+            				projecten: data.results
+            			});
+            			sap.ui.getCore().setModel(jsonModel, "projects");
+            	}
+            });
+            
 
 			this.setModel(oViewModel, "masterView");
 			// Make sure, busy indication is showing immediately so there is no
@@ -59,6 +77,75 @@ sap.ui.define([
 			this.getRouter().attachBypassed(this.onBypassed, this);
 			this._oODataModel = this.getOwnerComponent().getModel();
 		},
+		 onExport: sap.m.Table.prototype.exportData || function() {
+		 	
+		 	//https://blogs.sap.com/2017/08/02/download-the-model-data-to-a-csv-file-in-ui5/
+		 //	var model = this.getView().getModel("projects");
+		 	var model = sap.ui.getCore().getModel("projects");
+		 	
+		 	console.log("this");
+		 	console.log(model);
+		 	console.log("this");
+			var oExport = new Export({
+				
+			exportType: new ExportTypeCSV({
+					fileExtension: "csv",
+					separatorChar: ";"
+				}),
+			models: model,
+			rows: {
+					path: "/projecten"
+				},
+				columns: [{
+					name: "Project id",
+					template: {
+						content: "{Projectid}"
+					}
+				}, {
+					name: "Titel",
+					template: {
+						content: "{Titel}"
+					}
+				}, {
+					name: "Description",
+					template: {
+						content: "{Description}"
+					}
+				}, {
+					name: "Startdate",
+					template: {
+						content: "{Startdate}"
+					}
+				}, {
+					name: "Einddate",
+					template: {
+						content: "{Einddate}"
+					}
+				},
+				{
+					name: "Customer",
+					template: {
+						content: "{Customer}"
+					}
+				},
+				{
+					name: "Status",
+					template: {
+						content: "{Status}"
+					}
+				}
+				]
+			});
+			
+			console.log(oExport);
+			oExport.saveFile().catch(function(oError) {
+
+			}).then(function() {
+				oExport.destroy();
+			});
+
+		 	
+		 },
 
 		/* =========================================================== */
 		/* event handlers                                              */

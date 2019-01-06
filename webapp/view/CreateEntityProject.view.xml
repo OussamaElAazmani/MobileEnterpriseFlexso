@@ -7,31 +7,31 @@
 				labelSpanL="3" labelSpanM="3" layout="ResponsiveGridLayout" maxContainerCols="2" minWidth="1024"
 				title="{= ${viewModel>/mode} === 'edit'? 'Edit YXM_122_ODATA_SRV.ProjectOdata': 'New YXM_122_ODATA_SRV.ProjectOdata'}">
 				<f:content>
-					<Label text="Business event" required="true"/>
+					<Label text="Project id" required="true"/>
 					<Input name="Projectid" id="Projectid_id" valueLiveUpdate="true" liveChange="_validateSaveEnablement"
 						enabled="{= ${viewModel>/mode} === 'edit'? true: true}" visible="true"
 						value="{ path: 'Projectid', type: 'sap.ui.model.odata.type.String' , constraints:{ maxLength:8, nullable:false } }"/>
-					<Label text="30 Characters" required="true"/>
+					<Label text="Titel" required="true"/>
 					<Input name="Titel" id="Titel_id" valueLiveUpdate="true" liveChange="_validateSaveEnablement"
 						enabled="{= ${viewModel>/mode} === 'edit'? true: true}" visible="true"
 						value="{ path: 'Titel', type: 'sap.ui.model.odata.type.String' , constraints:{ maxLength:30, nullable:false } }"/>
-					<Label text="Character 300" required="true"/>
+					<Label text="Description" required="true"/>
 					<Input name="Description" id="Description_id" valueLiveUpdate="true" liveChange="_validateSaveEnablement"
 						enabled="{= ${viewModel>/mode} === 'edit'? true: true}" visible="true"
 						value="{ path: 'Description', type: 'sap.ui.model.odata.type.String' , constraints:{ maxLength:300, nullable:false } }"/>
-					<Label text="30 Characters" required="true"/>
+					<Label text="Startdate" required="true"/>
 					<Input name="Startdate" id="Startdate_id" valueLiveUpdate="true" liveChange="_validateSaveEnablement"
 						enabled="{= ${viewModel>/mode} === 'edit'? true: true}" visible="true"
 						value="{ path: 'Startdate', type: 'sap.ui.model.odata.type.String' , constraints:{ maxLength:30, nullable:false } }"/>
-					<Label text="30 Characters" required="true"/>
+					<Label text="Einddate" required="true"/>
 					<Input name="Einddate" id="Einddate_id" valueLiveUpdate="true" liveChange="_validateSaveEnablement"
 						enabled="{= ${viewModel>/mode} === 'edit'? true: true}" visible="true"
 						value="{ path: 'Einddate', type: 'sap.ui.model.odata.type.String' , constraints:{ maxLength:30, nullable:false } }"/>
-					<Label text="Char20" required="true"/>
+					<Label text="Customer" required="true"/>
 					<Input name="Customer" id="Customer_id" valueLiveUpdate="true" liveChange="_validateSaveEnablement"
 						enabled="{= ${viewModel>/mode} === 'edit'? true: true}" visible="true"
 						value="{ path: 'Customer', type: 'sap.ui.model.odata.type.String' , constraints:{ maxLength:20, nullable:false } }"/>
-					<Label text="Char20" required="true"/>
+					<Label text="Status" required="true"/>
 					<Input name="Status" id="Status_id" valueLiveUpdate="true" liveChange="_validateSaveEnablement"
 						enabled="{= ${viewModel>/mode} === 'edit'? true: true}" visible="true"
 						value="{ path: 'Status', type: 'sap.ui.model.odata.type.String' , constraints:{ maxLength:20, nullable:false } }"/>
