@@ -124,7 +124,7 @@ sap.ui.define([
 		 {
 		 	var row = oEventArgs.getSource();
         	var context = row.getBindingContext("modelPath");
-
+			var oView = this.getView();
         	// get binding object (reference to an object of the original array)
         	var person = context.oModel.getProperty(context.sPath);
         	
@@ -140,13 +140,116 @@ sap.ui.define([
             userModel.setData({
             	arrayName: array
             });
+          //  var oStorage = jQuery.sap.storage(jQuery.sap.storage.Type.local);
+            var oModelCheck = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+        	oModelCheck.read("/PdetailOdataSet", {
+        		success: function(data)
+        		{
+
+            	var mdl = new sap.ui.model.json.JSONModel();
+            			   mdl.setData({
+            					arrayName: {id: data.results}
+            
+            			   });
+            	oView.setModel(mdl, "PdetailPath"); 
+
+            	}
+        	});
+
 			
 			this.oAddfeedbackDialog.setModel(userModel, "userPath");
 			this.oAddfeedbackDialog.open();
+		 }, 
+		 
+		 onAddMembers: function()
+		 {
+		 	var oView = this.getView();
+		 	if (!this.oAddUserDialog) {
+				this.oAddUserDialog = sap.ui.xmlfragment("be.ehb.mobile.EnterpriseFlexso.view.AddUserDialog", this);
+				this.getView().addDependent(this.oAddUserDialog);
+			}
+			this.oAddUserDialog.open();
+			var oModelCheck = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+        	oModelCheck.read("/EmployeeOdataSet", {
+        		success: function(data)
+        		{
+					var odata = data.results; 
+            		var mdl = new sap.ui.model.json.JSONModel();
+            		mdl.setData({
+            			arrayName: odata
+            	
+            		});
+            		oView.setModel(mdl, "EmpPath"); 
+
+            	}
+        	});
+			
+		//	this.oAddUserDialog.setModel(userModel, "userPath");
+			
 		 },
 		 
+		 _onClose: function()
+		 {
+		 	 if (this.oAddUserDialog) {
+					this.oAddUserDialog.close();
+    		 }
+		 },
+		 
+		 _onAddUser: function()
+		 {
+		 	//
+		 	var employeeid = sap.ui.getCore().byId('selectId').getSelectedKey(); 
+        	var objectString = this.getView().getElementBinding().getPath();
+			var projectid = objectString.substring(19, 26);
+
+			var oModel = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
+			oModel.read("/PdetailOdataSet",{
+				success:function(data)
+				{
+					var latestid = 0;
+					var exist = false;
+					for(var i = 0; i < data.results.length; i++)
+					{
+						if(parseInt(data.results[0].Employeeid) == parseInt(employeeid) && parseInt(data.results[0].Projectid) == parseInt(projectid)) 
+						{
+							exist = true;	
+						}
+						latestid = data.results[i].Projectdetailid; 
+					}
+					latestid = parseInt(latestid);
+					latestid++;
+					
+					if(exist == false) 
+					{
+						var oData = {
+								  "d" : {
+								    "__metadata" : {
+								      "id" : "/PdetailOdataSet('00000001')",
+								      "uri" : "/PdetailOdataSet('00000001')",
+								      "type" : "YXM_122_ODATA_SRV.PdetailOdata"
+								    },
+								    "Projectdetailid" : latestid + "",
+								    "Employeeid" : parseInt(employeeid) + "",
+								    "Projectid" : parseInt(projectid) + "",
+								    "Evaluationid" : "",
+								    "EmployeeOdataSet" : {
+								      "__deferred" : {
+								        "uri" : "/PdetailOdataSet('00000001')/EmployeeOdataSet"
+								      }
+								    }
+								  }
+								};
+								
+						oModel.create("/PdetailOdataSet", oData);
+					}
+				}
+			});
+
+		 	
+		 },
 		 _onSubmitFeedback: function()
 		 {
+		 	var oView = this.getView();
 		 	var model = this.oAddfeedbackDialog.getModel("userPath");
 		 	var person = model.oData.arrayName[0];
 		 	var quality = sap.ui.getCore().byId("quality").getValue();
@@ -155,53 +258,155 @@ sap.ui.define([
 		 	var info = sap.ui.getCore().byId("info").getValue();
 		 	var latestid = 0;
 		    var oModel = new sap.ui.model.odata.v2.ODataModel({serviceUrl: "/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/"});
-           oModel.read("/EvalutieOdataSet", {
-				method: "GET",
-            	success: function(data){
-            		for(var i = 0; i < data.results.length; i++)
-            		{
-            			latestid = data.results[i].Evaluationid;
-            		}
-            		latestid = parseInt(latestid);
-            		latestid += 1;
-            		
-            		var oData = {
-						"d" : {
-    						"__metadata" : {
-    								"id" : "/EvalutieOdataSet('00000004')",
-    								"uri" : "/EvalutieOdataSet('00000004')",
-    								"type" : "YXM_122_ODATA_SRV.EvalutieOdata"
+        	oModel.read("/EvalutieOdataSet", {
+					method: "GET",
+        	 	success: function(data){
+        	 		for(var i = 0; i < data.results.length; i++)
+        	 		{
+        	 			latestid = data.results[i].Evaluationid;
+        	 		}
+        	 		latestid = parseInt(latestid);
+        	 		latestid += 1;
+        	 		
+        	 		var oData = {
+							"d" : {
+    							"__metadata" : {
+    									"id" : "/EvalutieOdataSet('00000004')",
+    									"uri" : "/EvalutieOdataSet('00000004')",
+    									"type" : "YXM_122_ODATA_SRV.EvalutieOdata"
+    							},
+								"Evaluationid" : latestid + "",
+								"Quality" : quality + "",
+								"Punctuality" : deadlines + "",
+								"Extraimpact" : extra + "",
+								"Info" : info + ""
+							}
+						};
+						
+						var oDataModel = new sap.ui.model.odata.v2.ODataModel("/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/");
+        	                             
+    					oDataModel.create("/EvalutieOdataSet", oData, {
+    						success: function()
+    						{
+							 //  sap.m.MessageToast.show(person.name + " was evaluated");
+							   
+							   var jsonModel = new sap.ui.model.json.JSONModel();
+        	 			   jsonModel.setData({
+        	 					arrayName: {id: latestid}
+        	 
+        	 			   });
+        	 		    oView.setModel(jsonModel, "latestPath");
     						},
-							"Evaluationid" : latestid + "",
-							"Quality" : quality + "",
-							"Punctuality" : deadlines + "",
-							"Extraimpact" : extra + "",
-							"Info" : info + ""
-						}
-					};
-					
-					var oDataModel = new sap.ui.model.odata.v2.ODataModel("/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/");
-                                        
-    				oDataModel.create("/EvalutieOdataSet", oData, {
-    					success: function()
-    					{
-    						
-						   sap.m.MessageToast.show(person.name + " was evaluated");
-    					},
-    					error: function()
-    					{
-    						if (this.oAddfeedbackDialog) {
+    						error: function()
+    						{
+    						   var jsonModel = new sap.ui.model.json.JSONModel();
+        	 			   jsonModel.setData({
+        	 					arrayName: {id: -1}
+        	 
+        	 			   });
+        	 		       oView.setModel(jsonModel, "latestPath");
+							 //  sap.m.MessageBox.error(person.name + " was not evaluated");
+    						}
+    					});
+        	 	}
+        	 });
+            
+		 			// id of created evaluation
+        			var testModel = oView.getModel("latestPath").oData;
+            		var id = testModel.arrayName.id;	
+            		// all pdetails
+            		var details = oView.getModel("PdetailPath").oData;
+    				var exist = false;
+        			var pdetailid = -1;
+        			var latest = 0;
+
+        		
+        			for(var i = 0; i < details.arrayName["id"].length; i++)
+        			{
+        				if(parseInt(details.arrayName["id"][i].Employeeid) === parseInt(person.empid) && parseInt(details.arrayName["id"][i].Projectid) === person.projid)
+        				{
+        					
+        					pdetailid = details.arrayName["id"][i].Projectdetailid;
+
+        					exist = true;
+        				}
+        				latest = details.arrayName["id"][i].Projectdetailid;
+
+        				if(exist)
+        				{
+        					i = details.arrayName["id"].length;
+        				}
+        			}
+        			latest = parseInt(latest);
+        			latest++;
+        		
+        			if(exist)
+        			{
+        				
+        				var data = 
+									{
+									  "d" : {
+									    "__metadata" : {
+									      "id" : "/PdetailOdataSet('00000001')",
+									      "uri" : "/PdetailOdataSet('00000001')",
+									      "type" : "YXM_122_ODATA_SRV.PdetailOdata"
+									    },
+									    "Projectdetailid" : pdetailid + "",
+									    "Employeeid" : person.empid + "",
+									    "Projectid" : person.projid + "",
+									    "Evaluationid" : id+ "",
+									    "EmployeeOdataSet" : {
+									      "__deferred" : {
+									        "uri" : "/PdetailOdataSet('00000001')/EmployeeOdataSet"
+									      }
+									    }
+									  }
+									};
+        				
+        				
+        				var path = "/PdetailOdataSet('" + parseInt(pdetailid) + "')";
+        				var oDataModel = new sap.ui.model.odata.v2.ODataModel("/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/");
+    					oDataModel.update(path, data);
+    					
+    					 if (this.oAddfeedbackDialog) {
+							this.oAddfeedbackDialog.close();
+    					 }
+        			}
+        			else
+        			{
+        					var data = 
+									{
+									  "d" : {
+									    "__metadata" : {
+									      "id" : "/PdetailOdataSet('00000001')",
+									      "uri" : "/PdetailOdataSet('00000001')",
+									      "type" : "YXM_122_ODATA_SRV.PdetailOdata"
+									    },
+									    "Projectdetailid" : latest + "",
+									    "Employeeid" : person.empid + "",
+									    "Projectid" : person.projid + "",
+									    "Evaluationid" : id + "",
+									    "EmployeeOdataSet" : {
+									      "__deferred" : {
+									        "uri" : "/PdetailOdataSet('00000001')/EmployeeOdataSet"
+									      }
+									    }
+									  }
+									};
+        				var path = "/PdetailOdataSet('" + parseInt(pdetailid) + "')";
+        				var oDataModel = new sap.ui.model.odata.v2.ODataModel("/SAPGateway/sap/opu/odata/SAP/YXM_122_ODATA_SRV/");
+    					oDataModel.create(path, data);
+    					
+    					 if (this.oAddfeedbackDialog) {
 								this.oAddfeedbackDialog.close();
-								}
-						   sap.m.MessageBox.error(person.name + " was not evaluated");
-    					}
-    				});
-            	}
-            });	
-			if (this.oAddfeedbackDialog) {
-				this.oAddfeedbackDialog.close();
-			}
+							}
+        			}
+
+            
+
 		 },
+		 
+	
 		 
 		 _onCloseFeedback: function()
 		 {

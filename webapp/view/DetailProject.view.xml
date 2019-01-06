@@ -21,7 +21,7 @@
                                 <firstStatus />
                                 <secondStatus />
                             </ObjectListItem>
-                            <ObjectListItem intro="" title="Deadline" icon="sap-icon://date-time" number="{Einddata}" numberUnit="" numberState="None" type="Active" selected="false" showMarkers="false">
+                            <ObjectListItem intro="" title="Deadline" icon="sap-icon://date-time" number="{Einddate}" numberUnit="" numberState="None" type="Active" selected="false" showMarkers="false">
                                 <attributes />
                                 <firstStatus />
                                 <secondStatus />
@@ -31,6 +31,7 @@
                                 <firstStatus />
                                 <secondStatus />
                             </ObjectListItem>
+                            <Button text="Add member" press="onAddMembers"/>
                         </content>
                     </IconTabFilter>
                     <IconTabFilter id="iconTabBarFilter2" icon="sap-icon://attachment" tooltip="{i18n>;detailIconTabBarAttachments}">

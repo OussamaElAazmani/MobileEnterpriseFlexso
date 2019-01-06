@@ -1,16 +1,78 @@
-<mvc:View controllerName="be.ehb.mobile.EnterpriseFlexso.controller.Detail" xmlns="sap.m" xmlns:mvc="sap.ui.core.mvc"
-	xmlns:semantic="sap.m.semantic" xmlns:footerbar="sap.ushell.ui.footerbar">
+<mvc:View controllerName="be.ehb.mobile.EnterpriseFlexso.controller.Detail"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:semantic="sap.m.semantic"
+	xmlns:footerbar="sap.ushell.ui.footerbar">
 	<semantic:DetailPage id="page" navButtonPress="onNavBack" showNavButton="{device>/system/phone}" title="{i18n>detailTitle}"
 		busy="{detailView>/busy}" busyIndicatorDelay="{detailView>/delay}">
 		<semantic:content>
-			<MessageStrip text="Name: {Firstname} {Lastname}" class="sapUiTinyMargin" />
-			<MessageStrip text="Phone: {Phonenumber}" class="sapUiTinyMargin" />
-			<MessageStrip text="Email: {Email}" class="sapUiTinyMargin" />
-			<MessageStrip text="Adres: {Address}" class="sapUiTinyMargin" />
-			<MessageStrip text="Birthdate: {Birthdate}" class="sapUiTinyMargin" />
-			<MessageStrip text="Job: {Job}" class="sapUiTinyMargin" />
+			<IconTabBar id="iconTabBar" class="sapUiResponsiveContentPadding">
+				<items>
+					<IconTabFilter id="iconTabBarFilter1" icon="sap-icon://hint" tooltip="{i18n>;detailIconTabBarInfo}">
+						<content>
+							<ObjectListItem intro="" title="Name" icon="sap-icon://person-placeholder" number="{Firstname} {Lastname}" numberUnit="" numberState="None" type="Active" selected="false" showMarkers="false">
+								<attributes/>
+								<firstStatus/>
+								<secondStatus/>
+							</ObjectListItem>
+							<ObjectListItem intro="" title="Phone" icon="sap-icon://iphone" number="{Phonenumber}" numberUnit="" numberState="None" type="Active" selected="false" showMarkers="false">
+								<attributes/>
+								<firstStatus/>
+								<secondStatus/>
+							</ObjectListItem>
+							<ObjectListItem intro="" title="Adres" icon="sap-icon://map-3" number="{Address}" numberUnit="" numberState="None" type="Active" selected="false" showMarkers="false">
+								<attributes/>
+								<firstStatus/>
+								<secondStatus/>
+							</ObjectListItem>
+							<ObjectListItem intro="" title="E-mail" icon="sap-icon://email" number=" {Email}" numberUnit="" numberState="None" type="Active" selected="false" showMarkers="false">
+								<attributes/>
+								<firstStatus/>
+								<secondStatus/>
+							</ObjectListItem>
+							<ObjectListItem intro="" title="Job" icon="sap-icon://work-history" number="{Job}" numberUnit="" numberState="None" type="Active" selected="false" showMarkers="false">
+								<attributes/>
+								<firstStatus/>
+								<secondStatus/>
+							</ObjectListItem>
+							<ObjectListItem intro="" title="Birthdate" icon="sap-icon://date-time" number="{Birthdate}" numberUnit="" numberState="None" type="Active" selected="false" showMarkers="false">
+								<attributes/>
+								<firstStatus/>
+								<secondStatus/>
+							</ObjectListItem>
+						</content>
+					</IconTabFilter>
+					<IconTabFilter id="iconTabBarFilter2" icon="sap-icon://attachment" tooltip="{i18n>;detailIconTabBarAttachments}">
+					<Table items="{ path: 'evaluatieModel>/arrayName' }">
+                            <columns>
+                                <Column>
+                                    <Text text="Qualiteit werk" />
+                                </Column>
+                                <Column>
+                                    <Text text="punctualiteit" />
+                                </Column>
+                                <Column>
+                                    <Text text="Extra impact" />
+                                </Column>
+                                <Column>
+                                    <Text text="Info" />
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <cells>
+                                        <Text text="{evaluatieModel>Quality}/20" />
+                                        <Text text="{evaluatieModel>Punctuality}/20" />
+                                        <Text text="{evaluatieModel>Extraimpact}/20" />
+                                        <Text text="{evaluatieModel>Info}" />
+                                    </cells>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+					</IconTabFilter>
+				</items>
+			</IconTabBar>
 		</semantic:content>
-		<Button text="load" press="onLoadDetail"></Button>
 		<semantic:editAction>
 			<semantic:EditAction id="edit" press="onEdit"/>
 		</semantic:editAction>
